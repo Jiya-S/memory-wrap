@@ -1,0 +1,12 @@
+__pycache__/
+architectures/__pycache__/
+.pyc
+core
+*transfer*.py
+*.pyc
+.vscode/paper/datasets/
+paper/models/*.pt
+paper/images/
+paper/datasets/
+paper/models/*.pt
+paper/images/
