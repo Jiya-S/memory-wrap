@@ -273,7 +273,7 @@ def get_CINIC10(data_dir:str, batch_size_train:int, batch_size_test:int,batch_si
     torchvision.datasets.ImageFolder(cinic_directory + '/test',
     	transform=torchvision.transforms.Compose([torchvision.transforms.ToTensor(),
         normalize])),
-    batch_size=batch_size_test, shuffle=True)
+    batch_size=batch_size_test, shuffle=False)
 
     val_loader = torch.utils.data.DataLoader(
     torchvision.datasets.ImageFolder(cinic_directory + '/valid',
