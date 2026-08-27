@@ -69,8 +69,8 @@ def run(path:str,dataset_dir:str):
         transformed_im = np.transpose(im, (1, 2, 0))
         return transformed_im
 
-
-    for batch_idx, (images, _) in enumerate(test_loader):
+    abs_idx = 0
+    for batch_idx, (images, labels) in enumerate(test_loader):
         print("Batch:{}/{}".format(batch_idx, len(test_loader)), end='\r')
         try:
             memory, _ = next(memory_iter)
@@ -87,10 +87,13 @@ def run(path:str,dataset_dir:str):
 
         # compute memory outputs
         mem_val,memory_sorted_index = torch.sort(rw,descending=True)
-        fig = plt.figure(figsize=(batch_size_test*2, 4),dpi=300)
-        columns = batch_size_test
-        rows = 2
+        
         for ind in range(len(images)):
+            true_label_idx = labels[ind].item()
+            pred_label_idx = predictions[ind].item()
+            if pred_label_idx == true_label_idx:
+                abs_idx += 1
+                continue
             input_selected = images[ind].unsqueeze(0)
 
             # M_c u M_e : set of sample with a positive impact on prediction
@@ -100,21 +103,30 @@ def run(path:str,dataset_dir:str):
             reduced_mem = undo_normalization(memory[m_ec])
             npimg = torchvision.utils.make_grid(reduced_mem,nrow=4).cpu().numpy()
 
-            # build and store image
+            true_class_name = name_classes[true_label_idx]
+            pred_class_name = name_classes[pred_label_idx]
 
+            # build and store image
+            fig = plt.figure(figsize=(2, 4),dpi=300)
+            fig.add_subplot(2, 1, 1)
+            
             fig.add_subplot(rows, columns, ind+1)
             plt.imshow((get_image(input_selected)* 255).astype(np.uint8),interpolation='nearest', aspect='equal')
+            plt.title('Idx:{} True:{}\nPred:{}'.format(abs_idx, true_class_name, pred_class_name))
             plt.title('Prediction:{}'.format(name_classes[predictions[ind]]))
             plt.axis('off')
+            ax2 = fig.add_subplot(2, 1, 2)
             ax2 = fig.add_subplot(rows, columns, batch_size_test+1+ind)
             plt.imshow((np.transpose(npimg, (1,2,0))* 255).astype(np.uint8),interpolation='nearest', aspect='equal')
             plt.title('Used Samples')
             plt.axis('off')
-        fig.tight_layout()
-        fig.savefig(dir_save+str(batch_idx*batch_size_test+ind)+".png")
-        plt.close()
-        print('Generated {}/{} images'.format(batch_idx,len(test_loader)),end='\r')
-
+            fig.tight_layout()
+            fig.savefig(dir_save+'{}_true-{}_pred-{}.png'.format(abs_idx, true_class_name, pred_class_name))
+            plt.close()
+            
+            abs_idx += 1
+        print('Generated batch {}/{}'.format(batch_idx,len(test_loader)),end='\r')
+        
 
 def main(argv):
 
