@@ -129,8 +129,8 @@ def run(path: str, dataset_dir: str):
             abs_idx += 1
 
     fieldnames = ['abs_idx', 'true_class', 'original_pred', 'reproducibly_wrong',
-                  'knn_pred', 'knn_corrected', 'cluster_id', 'cluster_pred', 'cluster_corrected',
-                  'random_pred', 'random_corrected']
+            'knn_pred', 'knn_corrected', 'cluster_id', 'cluster_pred', 'cluster_corrected',
+               'random_pred', 'random_corrected']
     with open(FLAGS.out_csv, 'w', newline='') as f:
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
